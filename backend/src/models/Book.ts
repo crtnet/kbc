@@ -1,58 +1,37 @@
 import mongoose from 'mongoose';
 
 const bookSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
-  },
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  genre: {
-    type: String,
+  title: { type: String, required: true },
+  genre: { 
+    type: String, 
     required: true,
     enum: ['adventure', 'fantasy', 'mystery', 'educational']
   },
-  theme: {
-    type: String,
+  theme: { 
+    type: String, 
     required: true,
     enum: ['friendship', 'courage', 'kindness', 'responsibility']
   },
-  mainCharacter: {
-    type: String,
-    required: true
-  },
-  setting: {
-    type: String,
-    required: true
-  },
-  tone: {
-    type: String,
+  mainCharacter: { type: String, required: true },
+  setting: { type: String, required: true },
+  tone: { 
+    type: String, 
     required: true,
     enum: ['fun', 'adventurous', 'calm', 'educational']
   },
-  content: {
-    story: String,
-    pages: [{
-      text: String,
-      imageUrl: String
-    }]
-  },
+  content: { type: String },
+  pages: [String],
+  images: [Buffer],
+  avatar: Buffer,
+  pdfPath: String,
   status: {
     type: String,
-    enum: ['draft', 'generating', 'completed', 'failed'],
-    default: 'draft'
+    enum: ['generating', 'completed', 'error'],
+    default: 'generating'
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 export default mongoose.model('Book', bookSchema);

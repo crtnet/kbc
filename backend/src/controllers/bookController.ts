@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import Book from '../models/Book';
-import * as openaiService from '../services/openai';
+import OpenAIService from '../services/openai';
+import PDFGeneratorService from '../services/pdfGenerator';
+import ImageGeneratorService from '../services/imageGenerator';
+import AvatarGeneratorService from '../services/avatarGenerator';
+import logger from '../utils/logger';
 
 // Função para criar livro
 export const createBook = async (req: Request, res: Response) => {

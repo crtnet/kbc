@@ -1,4 +1,23 @@
 # Changelog
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
+e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
+
+## [0.4.0] - 2025-02-11
+
+### Adicionado
+- Geração de PDF dos livros com PDFKit
+- Sistema de geração de imagens usando DALL-E 3
+- Criação de avatar para personagens principais
+- Novo modelo de dados para suportar imagens e PDFs
+- Sistema de status mais detalhado para geração de conteúdo
+- Otimização de imagens com Sharp
+
+### Alterado
+- Modelo do livro atualizado para suportar novas funcionalidades
+- Sistema de armazenamento de imagens otimizado
+- Processo de geração de conteúdo mais robusto
 
 ## [0.3.0] - 2025-02-11
 
@@ -16,12 +35,7 @@
 ### Fixed
 - Corrigido erro de navegação após criação do livro
 
-Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
-
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
-e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
-
-## [Não lançado]
+## [0.1.0] - 2025-02-10
 
 ### Adicionado
 - Configuração inicial do projeto
