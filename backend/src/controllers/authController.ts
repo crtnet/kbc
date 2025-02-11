@@ -2,8 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+import { config } from '../config';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -15,6 +14,13 @@ export const register = async (req: Request, res: Response) => {
     if (!name || !email || !password || !type) {
       console.log('Missing required fields');
       return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    }
+
+    // Validar tipo de usuário
+    const validTypes = ['parent', 'child'];
+    if (!validTypes.includes(type)) {
+      console.log('Invalid user type:', type);
+      return res.status(400).json({ message: 'Tipo de usuário inválido' });
     }
 
     // Verificar se o usuário já existe
@@ -42,8 +48,8 @@ export const register = async (req: Request, res: Response) => {
     // Gerar token
     const token = jwt.sign(
       { id: user._id, type: user.type },
-      JWT_SECRET,
-      { expiresIn: '1d' }
+      config.jwt.secret,
+      { expiresIn: config.jwt.expiresIn }
     );
 
     res.status(201).json({
@@ -85,8 +91,8 @@ export const login = async (req: Request, res: Response) => {
     // Gerar token
     const token = jwt.sign(
       { id: user._id, type: user.type },
-      JWT_SECRET,
-      { expiresIn: '1d' }
+      config.jwt.secret,
+      { expiresIn: config.jwt.expiresIn }
     );
 
     res.json({

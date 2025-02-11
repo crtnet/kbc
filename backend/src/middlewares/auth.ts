@@ -1,8 +1,7 @@
 // src/middlewares/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+import { config } from '../config';
 
 interface TokenPayload {
   id: string;
@@ -42,7 +41,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    const decoded = jwt.verify(token, config.jwt.secret) as TokenPayload;
 
     req.user = {
       id: decoded.id,

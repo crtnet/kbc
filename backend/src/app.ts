@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import bookRoutes from './routes/bookRoutes';
-import dotenv from 'dotenv';
 
 // Carrega as variáveis de ambiente
 dotenv.config();

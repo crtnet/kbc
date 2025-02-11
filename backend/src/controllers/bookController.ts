@@ -1,31 +1,17 @@
-// backend/src/controllers/bookController.ts
 import { Request, Response } from 'express';
-import { Configuration, OpenAIApi } from 'openai';
 import Book from '../models/Book';
-import dotenv from 'dotenv';
-
-// Carrega as variáveis de ambiente
-dotenv.config();
-
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-
-// Verifica se a chave da API está configurada
-if (!OPENAI_API_KEY) {
-  console.error('OPENAI_API_KEY não está configurada!');
-  process.exit(1);
-}
-
-const configuration = new Configuration({
-  apiKey: OPENAI_API_KEY
-});
-
-const openai = new OpenAIApi(configuration);
+import * as openaiService from '../services/openai';
 
 // Função para criar livro
 export const createBook = async (req: Request, res: Response) => {
   try {
     const { title, genre, theme, mainCharacter, setting, tone } = req.body;
-    const userId = req.user.id;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      console.error('User ID não encontrado no request');
+      return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
 
     console.log('Criando livro:', {
       title,
@@ -36,6 +22,11 @@ export const createBook = async (req: Request, res: Response) => {
       tone,
       userId
     });
+
+    // Validar campos obrigatórios
+    if (!title || !genre || !theme || !mainCharacter || !setting || !tone) {
+      return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    }
 
     const book = new Book({
       title,
@@ -70,13 +61,20 @@ export const createBook = async (req: Request, res: Response) => {
 export const getBook = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      console.error('User ID não encontrado no request');
+      return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
     const book = await Book.findById(id);
     
     if (!book) {
       return res.status(404).json({ message: 'Livro não encontrado' });
     }
 
-    if (book.author.toString() !== req.user.id) {
+    if (book.author.toString() !== userId) {
       return res.status(403).json({ message: 'Acesso negado' });
     }
 
@@ -90,7 +88,13 @@ export const getBook = async (req: Request, res: Response) => {
 // Função para listar livros do usuário
 export const getUserBooks = async (req: Request, res: Response) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      console.error('User ID não encontrado no request');
+      return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
     const books = await Book.find({ author: userId })
       .sort({ createdAt: -1 })
       .select('-content.story');
@@ -113,66 +117,16 @@ async function generateBookContent(bookId: string) {
       return;
     }
 
-    console.log('Verificando configuração da OpenAI...');
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY não está configurada');
-    }
-
     // Gerar história
-    const storyPrompt = `
-      Crie uma história infantil em português com as seguintes características:
-      - Título: ${book.title}
-      - Gênero: ${book.genre}
-      - Tema: ${book.theme}
-      - Personagem Principal: ${book.mainCharacter}
-      - Cenário: ${book.setting}
-      - Tom: ${book.tone}
-      
-      A história deve:
-      - Ter aproximadamente 500 palavras
-      - Ser dividida em 5 páginas
-      - Cada página deve ter um parágrafo curto
-      - Ser adequada para crianças
-      - Ter uma moral relacionada ao tema
-      - Ser envolvente e criativa
-      - Incluir diálogos
-      - Ter um final feliz
-    `;
-
     console.log('Gerando história...');
-    const completion = await openai.createCompletion({
-      model: "text-davinci-003",
-      prompt: storyPrompt,
-      max_tokens: 1000,
-      temperature: 0.7,
-    });
-
-    const story = completion.data.choices[0].text?.trim() || '';
+    const story = await openaiService.generateStory(book);
     const pages = story.split('\n\n').filter(Boolean).map(text => ({ text, imageUrl: '' }));
 
     // Gerar imagens
     console.log('Gerando imagens...');
     for (let i = 0; i < pages.length; i++) {
-      const imagePrompt = `
-        Crie uma ilustração infantil colorida para a seguinte cena:
-        "${pages[i].text}"
-        
-        Estilo:
-        - Ilustração infantil colorida
-        - Estilo amigável e acolhedor
-        - Cores vibrantes
-        - Personagens expressivos
-        - Adequado para crianças
-      `;
-
-      const imageResponse = await openai.createImage({
-        prompt: imagePrompt,
-        n: 1,
-        size: "512x512",
-      });
-
-      pages[i].imageUrl = imageResponse.data.data[0].url || '';
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      pages[i].imageUrl = await openaiService.generateImage(pages[i].text);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Respeitar rate limit
     }
 
     // Atualizar livro
