@@ -7,6 +7,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import CreateBookScreen from '../screens/CreateBookScreen';
+import ViewBookScreen from '../screens/ViewBookScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +44,17 @@ export function AppNavigator() {
             component={CreateBookScreen}
             options={{
               title: 'Criar Novo Livro',
+              headerStyle: {
+                backgroundColor: '#1976d2',
+              },
+              headerTintColor: '#fff',
+            }}
+          />
+          <Stack.Screen
+            name="ViewBook"
+            component={ViewBookScreen}
+            options={{
+              title: 'Visualizar Livro',
               headerStyle: {
                 backgroundColor: '#1976d2',
               },
