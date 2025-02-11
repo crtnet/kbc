@@ -1,4 +1,24 @@
 # Changelog
+
+## [0.5.0] - 2025-02-11
+
+### Adicionado
+- Nova estrutura de serviços mais modular
+- Sistema de geração assíncrona de conteúdo
+- Melhor tratamento de erros e logs
+- Validação de dados mais robusta
+
+### Alterado
+- Refatoração do OpenAIService para usar classes
+- Modelo de livro atualizado com novos status
+- Sistema de logs centralizado
+
+### Corrigido
+- Erro de 'openaiService is not defined'
+- Problemas com validação de status
+- Importações incorretas
+
+# Versões Anteriores
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
