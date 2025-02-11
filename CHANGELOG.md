@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.6.0] - 2025-02-11
+
+### Adicionado
+- Sistema de retry para chamadas da OpenAI
+- Validação de chave API da OpenAI
+- Suporte a DALL-E 3 para geração de imagens
+- Logs detalhados para debugging
+
+### Alterado
+- Atualização da biblioteca OpenAI para a versão mais recente
+- Refatoração completa do OpenAIService
+- Configurações separadas para modelos de texto e imagem
+- Melhor tratamento de erros nas chamadas à API
+
+### Corrigido
+- Erro na configuração do OpenAI
+- Problemas de tipagem com a nova versão da API
+- Tratamento inadequado de erros da API
+
 ## [0.5.0] - 2025-02-11
 
 ### Adicionado
