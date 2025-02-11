@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0] - 2025-02-11
+
+### Changed
+- Atualizado modelo OpenAI para gpt-3.5-turbo
+- Melhorada a qualidade da geração de histórias
+- Otimizado o prompt do sistema
+
 ## [0.2.0] - 2025-02-11
 
 ### Added

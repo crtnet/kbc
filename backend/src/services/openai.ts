@@ -33,14 +33,23 @@ export const generateStory = async (book: any) => {
     - Ter um final feliz
   `;
 
-  const completion = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt: storyPrompt,
-    max_tokens: 1000,
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content: "Você é um escritor especializado em histórias infantis. Crie histórias envolventes, adequadas para crianças, com lições de moral e finais felizes."
+      },
+      {
+        role: "user",
+        content: storyPrompt
+      }
+    ],
     temperature: 0.7,
+    max_tokens: 1000,
   });
 
-  return completion.data.choices[0].text?.trim() || '';
+  return response.data.choices[0]?.message?.content?.trim() || '';
 };
 
 export const generateImage = async (text: string) => {
