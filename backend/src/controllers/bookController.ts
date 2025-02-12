@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
-import Book from '../models/Book';
-import * as openaiService from '../services/openai';
+import Book from '../models/book';
+import OpenAIService from '../services/openai';
+import PDFGeneratorService from '../services/pdfGenerator';
+import ImageGeneratorService from '../services/imageGenerator';
+import AvatarGeneratorService from '../services/avatarGenerator';
+import logger from '../utils/logger';
 
 // Função para criar livro
 export const createBook = async (req: Request, res: Response) => {
@@ -118,21 +122,58 @@ async function generateBookContent(bookId: string) {
     }
 
     // Gerar história
-    console.log('Gerando história...');
-    const story = await openaiService.generateStory(book);
-    const pages = story.split('\n\n').filter(Boolean).map(text => ({ text, imageUrl: '' }));
+    logger.info('Gerando história...');
+    const content = await OpenAIService.generateStory({
+      title: book.title,
+      genre: book.genre,
+      theme: book.theme,
+      mainCharacter: book.mainCharacter,
+      setting: book.setting,
+      tone: book.tone
+    });
 
-    // Gerar imagens
-    console.log('Gerando imagens...');
-    for (let i = 0; i < pages.length; i++) {
-      pages[i].imageUrl = await openaiService.generateImage(pages[i].text);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Respeitar rate limit
-    }
+    // 2. Gerar avatar do personagem
+    logger.info('Gerando avatar...');
+    const avatar = await AvatarGeneratorService.generateCharacterAvatar({
+      name: book.mainCharacter,
+      characteristics: [book.genre, book.theme, book.tone]
+    });
 
-    // Atualizar livro
-    book.content = { story, pages };
+    // 3. Gerar imagens para cada página
+    logger.info('Gerando imagens das páginas...');
+    const pages = content.split('\n\n');
+    const images = await Promise.all(
+      pages.map(page => ImageGeneratorService.generatePageImage({
+        scene: page,
+        style: book.genre,
+        character: book.mainCharacter
+      }))
+    );
+
+    // 4. Gerar PDF
+    logger.info('Gerando PDF...');
+    const pdfPath = await PDFGeneratorService.generateBookPDF({
+      id: book._id.toString(),
+      title: book.title,
+      content: pages,
+      images,
+      mainCharacter: {
+        name: book.mainCharacter,
+        avatar
+      }
+    });
+
+    // 5. Atualizar livro no banco
+    logger.info('Salvando alterações...');
+    book.content = content;
+    book.pages = pages;
+    book.images = images;
+    book.avatar = avatar;
+    book.pdfPath = pdfPath;
     book.status = 'completed';
     await book.save();
+
+    logger.info('Livro gerado com sucesso!');
 
     console.log('Livro gerado com sucesso:', bookId);
   } catch (error) {

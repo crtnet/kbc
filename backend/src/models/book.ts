@@ -2,23 +2,11 @@ import mongoose from 'mongoose';
 
 const bookSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  genre: { 
-    type: String, 
-    required: true,
-    enum: ['adventure', 'fantasy', 'mystery', 'educational']
-  },
-  theme: { 
-    type: String, 
-    required: true,
-    enum: ['friendship', 'courage', 'kindness', 'responsibility']
-  },
+  genre: { type: String, required: true },
+  theme: { type: String, required: true },
   mainCharacter: { type: String, required: true },
   setting: { type: String, required: true },
-  tone: { 
-    type: String, 
-    required: true,
-    enum: ['fun', 'adventurous', 'calm', 'educational']
-  },
+  tone: { type: String, required: true },
   content: { type: String },
   pages: [String],
   images: [Buffer],
@@ -26,10 +14,10 @@ const bookSchema = new mongoose.Schema({
   pdfPath: String,
   status: {
     type: String,
-    enum: ['generating', 'completed', 'error'],
+    enum: ['generating', 'completed', 'error', 'failed'],
     default: 'generating'
   },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
